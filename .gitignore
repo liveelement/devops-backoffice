@@ -9,3 +9,6 @@ build/
 *.egg
 .env
 .DS_Store
+
+# Restore with workflow-scoped token; see docs/PUBLISH.md
+.github/
