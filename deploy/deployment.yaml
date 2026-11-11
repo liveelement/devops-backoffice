@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devops-backoffice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: devops-backoffice
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: devops-backoffice
+    spec:
+      containers:
+        - name: backoffice
+          image: ghcr.io/liveelement/devops-backoffice:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: OTEL_SDK_DISABLED
+              value: "true"
+            - name: LINKS_CONFIG_PATH
+              value: /config/links.yaml
+            - name: APP_VERSION
+              value: "0.1.0"
+          volumeMounts:
+            - name: links
+              mountPath: /config
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+      volumes:
+        - name: links
+          configMap:
+            name: devops-backoffice-links

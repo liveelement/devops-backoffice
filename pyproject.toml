@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "devops-backoffice"
+version = "0.1.0"
+description = "Free Kubernetes ops landing — Argo CD, Grafana, Jaeger, Kibana, and env links"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+  "flask>=3.0.3",
+  "gunicorn>=22.0.0",
+  "PyYAML>=6.0.2",
+  "prometheus-client>=0.21.0",
+  "prometheus-flask-exporter>=0.23.0",
+  "opentelemetry-api>=1.27.0",
+  "opentelemetry-sdk>=1.27.0",
+  "opentelemetry-exporter-otlp-proto-http>=1.27.0",
+  "opentelemetry-instrumentation-flask>=0.48b0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "ruff>=0.8.0",
+]
+
+[project.scripts]
+devops-backoffice = "backoffice.app:main"
+
+[project.urls]
+Homepage = "https://github.com/liveelement/devops-backoffice"
+Repository = "https://github.com/liveelement/devops-backoffice"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+backoffice = ["templates/*.html", "static/css/*", "static/js/*", "config/*.yaml"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

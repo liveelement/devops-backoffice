@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}DevOps Backoffice{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('index') }}">devops-backoffice</a>
+    <nav>
+      <a href="{{ url_for('index', env=selected_environment) }}">Home</a>
+      <a href="{{ url_for('dashboard', env=selected_environment) }}">Dashboard</a>
+      <a href="{{ url_for('api_links', env=selected_environment) }}">Links API</a>
+    </nav>
+    <span class="version-pill" id="version-pill" data-version="{{ version }}">v{{ version }}</span>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: devops-backoffice-links
+data:
+  links.yaml: |
+    title: DevOps Operations Hub
+    subtitle: Daily links for GitOps, observability, cloud, and source control.
+    default_environment: dev
+    environments:
+      dev:
+        label: Development
+        links:
+          - id: argocd
+            label: Argo CD
+            url: http://127.0.0.1:8081
+            description: Application sync status and GitOps drift (port-forward).
+            external: true
+          - id: grafana
+            label: Grafana
+            url: http://127.0.0.1:3000
+            description: Metrics dashboards (port-forward).
+            external: true
+          - id: aws-console
+            label: AWS Console
+            url: https://console.aws.amazon.com/
+            description: Cloud console for the account that owns the cluster.
+            external: true

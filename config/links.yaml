@@ -1,0 +1,74 @@
+# DevOps landing-page links per environment.
+# Mount or set LINKS_CONFIG_PATH to override in your cluster.
+title: DevOps Operations Hub
+subtitle: Daily links for GitOps, observability, cloud, and source control.
+default_environment: dev
+
+environments:
+  dev:
+    label: Development
+    links:
+      - id: argocd
+        label: Argo CD
+        url: http://127.0.0.1:8081
+        description: Application sync status and GitOps drift (port-forward).
+        external: true
+      - id: grafana
+        label: Grafana
+        url: http://127.0.0.1:3000
+        description: Metrics dashboards (port-forward).
+        external: true
+      - id: jaeger
+        label: Jaeger
+        url: http://127.0.0.1:16686/
+        description: Distributed traces (port-forward).
+        external: true
+      - id: kibana
+        label: Kibana
+        url: https://127.0.0.1:5601
+        description: Log UI (port-forward).
+        external: true
+      - id: aws-console
+        label: AWS Console
+        url: https://console.aws.amazon.com/
+        description: Cloud console for the account that owns the cluster.
+        external: true
+      - id: git
+        label: Git repository
+        url: https://github.com/example/platform
+        description: Replace with your platform Git remote.
+        external: true
+
+  prod:
+    label: Production
+    links:
+      - id: argocd
+        label: Argo CD
+        url: https://argocd.REPLACE_WITH_DOMAIN
+        description: Production GitOps applications and sync status.
+        external: true
+      - id: grafana
+        label: Grafana
+        url: https://grafana.REPLACE_WITH_DOMAIN
+        description: Production metrics dashboards.
+        external: true
+      - id: jaeger
+        label: Jaeger
+        url: https://jaeger.REPLACE_WITH_DOMAIN
+        description: Production distributed traces.
+        external: true
+      - id: kibana
+        label: Kibana
+        url: https://kibana.REPLACE_WITH_DOMAIN
+        description: Production logs UI.
+        external: true
+      - id: aws-console
+        label: AWS Console
+        url: https://console.aws.amazon.com/
+        description: Cloud console for the production account.
+        external: true
+      - id: git
+        label: Git repository
+        url: https://github.com/example/platform
+        description: Replace with your platform Git remote.
+        external: true

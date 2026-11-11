@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · {{ selected_environment }} · devops-backoffice{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Operations dashboard</h1>
+  <div class="env-bar">
+    <label class="env-label" for="environment-select">Environment</label>
+    <select id="environment-select" class="env-select" name="env" aria-label="Select environment">
+      {% for env in environments %}
+      <option value="{{ env.name }}" {% if env.name == selected_environment %}selected{% endif %}>
+        {{ env.label }} ({{ env.name }})
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+  <dl class="kv">
+    <dt>Environment</dt><dd>{{ selected_environment_label }} ({{ selected_environment }})</dd>
+    <dt>Cluster</dt><dd>{{ cluster }}</dd>
+    <dt>App version</dt><dd id="dash-version">{{ version }}</dd>
+  </dl>
+  <p class="muted">Use <code>/version</code> during Argo Rollouts canaries to observe weight shifts.</p>
+  <button type="button" id="refresh-version" class="cta secondary">Refresh version</button>
+</section>
+
+{% if links %}
+<section class="ops-links compact" aria-label="Quick links">
+  <h2 class="section-label">Quick links · {{ selected_environment }}</h2>
+  <ul class="link-grid">
+    {% for link in links %}
+    <li>
+      <a
+        class="link-card"
+        href="{{ link.url }}"
+        {% if link.external %}target="_blank" rel="noopener noreferrer"{% endif %}
+      >
+        <span class="link-label">{{ link.label }}</span>
+        <span class="link-url">{{ link.url }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}

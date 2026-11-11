@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · {{ selected_environment }} · devops-backoffice{% endblock %}
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">devops-backoffice</p>
+  <h1>{{ title }}</h1>
+  <p class="lede">{{ subtitle }}</p>
+  <div class="env-bar">
+    <label class="env-label" for="environment-select">Environment</label>
+    <select id="environment-select" class="env-select" name="env" aria-label="Select environment">
+      {% for env in environments %}
+      <option value="{{ env.name }}" {% if env.name == selected_environment %}selected{% endif %}>
+        {{ env.label }} ({{ env.name }})
+      </option>
+      {% endfor %}
+    </select>
+    <p class="muted meta">
+      {{ selected_environment_label }} · {{ cluster }} · version
+      <strong id="hero-version">{{ version }}</strong>
+    </p>
+  </div>
+</section>
+
+<section class="ops-links" aria-label="Operations links for {{ selected_environment }}">
+  <h2 class="section-label">Daily operations · {{ selected_environment }}</h2>
+  <ul class="link-grid">
+    {% for link in links %}
+    <li>
+      <a
+        class="link-card"
+        href="{{ link.url }}"
+        {% if link.external %}target="_blank" rel="noopener noreferrer"{% endif %}
+      >
+        <span class="link-label">{{ link.label }}</span>
+        {% if link.description %}
+        <span class="link-desc">{{ link.description }}</span>
+        {% endif %}
+        <span class="link-url">{{ link.url }}</span>
+      </a>
+    </li>
+    {% else %}
+    <li class="muted">No links configured for <code>{{ selected_environment }}</code>.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}
