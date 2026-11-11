@@ -1,6 +1,6 @@
 # DevOps backoffice
 
-Free Kubernetes **ops landing**: one page for Argo CD, Grafana, Kibana, Jaeger, AWS Console, and your Git remote — per environment.
+Free Kubernetes **ops landing**: one page for Argo CD, Grafana, VictoriaMetrics, Kibana, Jaeger, CI, ECR, AWS Console, and your Git remote — per environment.
 
 This is a **sibling product** to [Apply Path · AWS EKS](https://github.com/liveelement/apply-path-aws-eks). It is not part of the paid Apply Path tree.
 

@@ -21,8 +21,38 @@ data:
             url: http://127.0.0.1:3000
             description: Metrics dashboards (port-forward).
             external: true
+          - id: victoriametrics
+            label: VictoriaMetrics
+            url: http://127.0.0.1:8428
+            description: Prometheus-compatible metrics API and UI (port-forward).
+            external: true
+          - id: jaeger
+            label: Jaeger
+            url: http://127.0.0.1:16686/
+            description: Distributed traces (port-forward).
+            external: true
+          - id: kibana
+            label: Kibana
+            url: https://127.0.0.1:5601
+            description: Log UI (port-forward).
+            external: true
+          - id: ci
+            label: CI
+            url: https://github.com/example/platform/actions
+            description: Replace with your GitHub Actions, GitLab CI, or Jenkins URL.
+            external: true
+          - id: ecr
+            label: ECR
+            url: https://console.aws.amazon.com/ecr/repositories
+            description: Container images in Amazon ECR.
+            external: true
           - id: aws-console
             label: AWS Console
             url: https://console.aws.amazon.com/
             description: Cloud console for the account that owns the cluster.
+            external: true
+          - id: git
+            label: Git repository
+            url: https://github.com/example/platform
+            description: Replace with your platform Git remote.
             external: true
