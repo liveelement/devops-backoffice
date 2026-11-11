@@ -56,7 +56,11 @@ nav a:hover { color: var(--accent-2); }
   color: var(--accent-2);
 }
 
-main { padding: 2.5rem 2rem; max-width: 1080px; margin: 0 auto; }
+main {
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
 
 .eyebrow {
   margin: 0 0 0.5rem;
@@ -68,15 +72,16 @@ main { padding: 2.5rem 2rem; max-width: 1080px; margin: 0 auto; }
 }
 
 .hero h1, .panel h1 {
-  font-size: clamp(2rem, 4vw, 3rem);
-  margin: 0 0 0.75rem;
+  font-size: clamp(1.75rem, 3.5vw, 2.4rem);
+  margin: 0 0 0.5rem;
 }
 
 .lede {
-  font-size: 1.15rem;
-  max-width: 40rem;
+  font-size: 1.05rem;
+  max-width: 42rem;
   line-height: 1.5;
-  color: var(--text);
+  color: var(--muted);
+  margin: 0;
 }
 
 .meta { margin: 0; }
@@ -86,7 +91,7 @@ main { padding: 2.5rem 2rem; max-width: 1080px; margin: 0 auto; }
   flex-wrap: wrap;
   align-items: center;
   gap: 0.75rem 1rem;
-  margin-top: 1.25rem;
+  margin-top: 1.1rem;
 }
 
 .env-label {
@@ -121,62 +126,114 @@ main { padding: 2.5rem 2rem; max-width: 1080px; margin: 0 auto; }
 .muted { color: var(--muted); }
 
 .section-label {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--muted);
-  margin: 2.5rem 0 1rem;
+  margin: 2rem 0 0.85rem;
   font-weight: 600;
 }
 
-.link-grid {
+.ops-split {
+  display: grid;
+  grid-template-columns: minmax(11rem, 14rem) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.tool-nav,
+.tool-table-wrap {
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  padding: 0.85rem 1rem 1rem;
+}
+
+.pane-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.tool-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1rem;
-}
-
-.link-card {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  height: 100%;
-  padding: 1.1rem 1.15rem;
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  text-decoration: none;
+  gap: 0.15rem;
+}
+
+.tool-list a {
+  display: block;
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.35rem;
   color: var(--text);
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  text-decoration: none;
+  font-weight: 600;
 }
 
-.link-card:hover {
-  border-color: var(--accent);
-  transform: translateY(-2px);
+.tool-list a:hover,
+.tool-list a:focus-visible {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--accent-2);
+  outline: none;
 }
 
-.link-label {
-  font-weight: 700;
-  font-size: 1.1rem;
+.tool-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
 }
 
-.link-desc {
+.tool-table th,
+.tool-table td {
+  text-align: left;
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.tool-table th {
   color: var(--muted);
-  font-size: 0.92rem;
-  line-height: 1.4;
-  flex: 1;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
-.link-url {
-  font-family: ui-monospace, monospace;
-  font-size: 0.75rem;
+.tool-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.tool-table td:first-child {
+  width: 11rem;
+  white-space: nowrap;
+}
+
+.tool-table a {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.tool-table a:hover {
+  color: var(--accent-2);
+  text-decoration: underline;
+}
+
+.tool-table a.url-cell {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.82rem;
+  font-weight: 500;
   color: var(--accent-2);
   word-break: break-all;
 }
 
-.ops-links.compact .section-label { margin-top: 1.75rem; }
+.ops-links.compact .section-label { margin-top: 1.5rem; }
 
 .cta {
   display: inline-block;
@@ -217,4 +274,15 @@ code {
   background: #0b1016;
   padding: 0.1rem 0.35rem;
   border-radius: 0.25rem;
+}
+
+@media (max-width: 720px) {
+  .ops-split {
+    grid-template-columns: 1fr;
+  }
+
+  .tool-table td:first-child {
+    width: auto;
+    white-space: normal;
+  }
 }
