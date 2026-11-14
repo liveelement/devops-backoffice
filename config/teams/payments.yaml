@@ -1,0 +1,39 @@
+label: Payments
+description: Payments domain — APIs and admin surfaces per environment.
+default_environment: dev
+environments:
+  dev:
+    products:
+    - id: payments-api
+      label: Payments API
+      url: https://payments-api.dev.example
+      description: Core payments HTTP API (dev).
+      version: 1.4.2
+      external: true
+    - id: payments-admin
+      label: Payments Admin
+      url: https://payments-admin.dev.example
+      description: Operator UI for refunds and disputes.
+      version: 1.4.2
+      external: true
+    services:
+    - id: payments-runbook
+      label: Payments runbook
+      category: other
+      url: https://wiki.example/payments/runbook
+      description: Team on-call and incident runbook.
+      external: true
+  prod:
+    products:
+    - id: payments-api
+      label: Payments API
+      url: https://payments-api.REPLACE_WITH_DOMAIN
+      description: Core payments HTTP API (prod).
+      version: 1.4.0
+      external: true
+    - id: payments-admin
+      label: Payments Admin
+      url: https://payments-admin.REPLACE_WITH_DOMAIN
+      description: Operator UI for refunds and disputes.
+      version: 1.4.0
+      external: true

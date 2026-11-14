@@ -1,75 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Dashboard · {{ selected_environment }} · devops-backoffice{% endblock %}
+{% block title %}Dashboard · devops-backoffice{% endblock %}
 {% block content %}
 <section class="panel">
-  <h1>Operations dashboard</h1>
-  <div class="env-bar">
-    <label class="env-label" for="environment-select">Environment</label>
-    <select id="environment-select" class="env-select" name="env" aria-label="Select environment">
-      {% for env in environments %}
-      <option value="{{ env.name }}" {% if env.name == selected_environment %}selected{% endif %}>
-        {{ env.label }} ({{ env.name }})
-      </option>
-      {% endfor %}
-    </select>
-  </div>
-  <dl class="kv">
-    <dt>Environment</dt><dd>{{ selected_environment_label }} ({{ selected_environment }})</dd>
-    <dt>Cluster</dt><dd>{{ cluster }}</dd>
-    <dt>App version</dt><dd id="dash-version">{{ version }}</dd>
-  </dl>
-  <p class="muted">Use <code>/version</code> during Argo Rollouts canaries to observe weight shifts.</p>
-  <button type="button" id="refresh-version" class="cta secondary">Refresh version</button>
+  <h1>Moved</h1>
+  <p class="muted">The dashboard route now redirects to the default team landing. If you still see this page, open <a href="{{ url_for('index') }}">Teams</a>.</p>
 </section>
-
-{% if links %}
-<section class="ops-links compact" aria-label="Quick links">
-  <h2 class="section-label">Quick links · {{ selected_environment }}</h2>
-  <div class="ops-split">
-    <nav class="tool-nav" aria-label="Tools">
-      <h3 class="pane-title">Tools</h3>
-      <ul class="tool-list">
-        {% for link in links %}
-        <li>
-          <a
-            href="{{ link.url }}"
-            {% if link.external %}target="_blank" rel="noopener noreferrer"{% endif %}
-          >{{ link.label }}</a>
-        </li>
-        {% endfor %}
-      </ul>
-    </nav>
-    <div class="tool-table-wrap">
-      <h3 class="pane-title">Links</h3>
-      <table class="tool-table">
-        <thead>
-          <tr>
-            <th scope="col">Tool</th>
-            <th scope="col">URL</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for link in links %}
-          <tr>
-            <td>
-              <a
-                href="{{ link.url }}"
-                {% if link.external %}target="_blank" rel="noopener noreferrer"{% endif %}
-              >{{ link.label }}</a>
-            </td>
-            <td>
-              <a
-                class="url-cell"
-                href="{{ link.url }}"
-                {% if link.external %}target="_blank" rel="noopener noreferrer"{% endif %}
-              >{{ link.url }}</a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-{% endif %}
 {% endblock %}

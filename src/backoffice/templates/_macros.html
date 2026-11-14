@@ -1,0 +1,103 @@
+{% macro creds_icon() -%}
+<svg class="creds-icon" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+  <path d="M8 1.5a3 3 0 0 0-1.2 5.75V9.5h-1.3v1.5h1.3V13h1.8v-2h1.3V9.5H8.6V7.25A3 3 0 0 0 8 1.5zm0 1.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="currentColor"/>
+</svg>
+{%- endmacro %}
+
+{% macro link_rows(links, environment, version_probe=false) %}
+{% for link in links %}
+{% set creds = link.credentials_view(environment) %}
+<tr
+  class="link-row"
+  data-service-id="{{ link.id }}"
+  data-filter-tool="{{ (link.label ~ ' ' ~ link.description ~ ' ' ~ link.id)|e }}"
+  data-filter-url="{{ link.url|e }}"
+  {% if creds %}data-has-creds="1"{% endif %}
+>
+  <td>
+    <span class="tool-cell">
+      <a
+        href="{{ link.url }}"
+        {% if link.external %}target="_blank" rel="noopener noreferrer"{% endif %}
+      >{{ link.label }}</a>
+      {% if creds %}
+      <button
+        type="button"
+        class="creds-toggle"
+        aria-expanded="false"
+        aria-controls="creds-{{ link.id }}"
+        title="Credentials cheat-sheet (no values fetched)"
+      >{{ creds_icon() }}</button>
+      {% endif %}
+    </span>
+  </td>
+  <td class="desc-cell">{{ link.description or "—" }}</td>
+  <td class="version-cell">
+    {% if version_probe %}
+    <span
+      class="version-badge"
+      data-service-id="{{ link.id }}"
+      data-declared="{{ link.version }}"
+      data-has-probe="{{ '1' if link.has_live_version_discovery() else '0' }}"
+      title="{% if link.version %}config: {{ link.version }}{% endif %}"
+    >{{ link.version or "—" }}</span>
+    {% else %}
+    {{ link.version or "—" }}
+    {% endif %}
+  </td>
+  <td>
+    <a
+      class="url-cell"
+      href="{{ link.url }}"
+      {% if link.external %}target="_blank" rel="noopener noreferrer"{% endif %}
+    >{{ link.url }}</a>
+  </td>
+</tr>
+{% if creds %}
+<tr class="creds-panel-row" id="creds-{{ link.id }}" hidden data-creds-for="{{ link.id }}">
+  <td colspan="4">
+    <div class="creds-panel">
+      <div class="creds-panel-head">
+        <strong>{{ creds.title }}</strong>
+        <span class="meta-pill meta-provider">{{ creds.provider }}</span>
+        {% if creds.location %}
+        <span class="mono creds-location">{{ creds.location }}</span>
+        {% endif %}
+        {% if creds.cluster %}
+        <span class="muted mono">· {{ creds.cluster }}</span>
+        {% endif %}
+      </div>
+      {% if creds.keys %}
+      <div class="creds-keys" aria-label="Secret keys">
+        {% for key in creds.keys %}
+        <span class="key-chip">{{ key }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if creds.commands %}
+      <ul class="creds-commands">
+        {% for item in creds.commands %}
+        <li>
+          <div class="creds-command-meta">
+            <span>{{ item.label }}</span>
+            <button type="button" class="copy-btn" data-copy="{{ item.command|e }}">Copy</button>
+          </div>
+          <pre class="creds-command"><code>{{ item.command }}</code></pre>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      {% if creds.links %}
+      <div class="creds-links">
+        {% for item in creds.links %}
+        <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.label }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <p class="creds-note muted">Backoffice does not fetch secrets — run the command in your terminal or open an external link.</p>
+    </div>
+  </td>
+</tr>
+{% endif %}
+{% endfor %}
+{% endmacro %}

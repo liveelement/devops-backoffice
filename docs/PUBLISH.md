@@ -1,16 +1,16 @@
 # Publishing DevOps backoffice
 
 Public repo: https://github.com/liveelement/devops-backoffice  
-Image: `ghcr.io/liveelement/devops-backoffice:0.1.0`
+Image: `ghcr.io/liveelement/devops-backoffice:0.2.0`
 
 ## Local image build / push
 
 ```bash
 cd products/devops-backoffice
-docker build -t ghcr.io/liveelement/devops-backoffice:0.1.0 .
+docker build -t ghcr.io/liveelement/devops-backoffice:0.2.0 .
 echo $GITHUB_TOKEN | docker login ghcr.io -u liveelement --password-stdin
-docker push ghcr.io/liveelement/devops-backoffice:0.1.0
-docker tag ghcr.io/liveelement/devops-backoffice:0.1.0 ghcr.io/liveelement/devops-backoffice:latest
+docker push ghcr.io/liveelement/devops-backoffice:0.2.0
+docker tag ghcr.io/liveelement/devops-backoffice:0.2.0 ghcr.io/liveelement/devops-backoffice:latest
 docker push ghcr.io/liveelement/devops-backoffice:latest
 ```
 
@@ -30,6 +30,6 @@ git push
 ## Tag a release
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.2.0
+git push origin v0.2.0
 ```

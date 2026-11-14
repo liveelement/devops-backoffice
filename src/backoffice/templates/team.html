@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% from "_macros.html" import link_rows %}
+{% block title %}{{ team.label }} · {{ selected_environment }} · devops-backoffice{% endblock %}
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">
+    <a class="crumb" href="{{ url_for('index') }}">Teams</a>
+    <span aria-hidden="true"> / </span>
+    {{ team.id }}
+  </p>
+  <h1>{{ team.label }}</h1>
+  {% if team.description %}
+  <p class="lede">{{ team.description }}</p>
+  {% else %}
+  <p class="lede">{{ subtitle }}</p>
+  {% endif %}
+  <div class="env-bar">
+    <label class="env-label" for="environment-select">Environment</label>
+    <select
+      id="environment-select"
+      class="env-select"
+      name="env"
+      aria-label="Select environment"
+      data-persist="1"
+    >
+      {% for env in environments %}
+      <option value="{{ env.name }}" {% if env.name == selected_environment %}selected{% endif %}>
+        {{ env.label }} ({{ env.name }})
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+  <dl class="env-meta" id="env-meta" aria-label="Environment metadata">
+    <div>
+      <dt>Type</dt>
+      <dd>{% if env_type %}<span class="meta-pill meta-type-{{ env_type }}">{{ env_type }}</span>{% else %}—{% endif %}</dd>
+    </div>
+    <div>
+      <dt>Cloud</dt>
+      <dd>{% if env_cloud %}{{ env_cloud }}{% else %}—{% endif %}</dd>
+    </div>
+    <div>
+      <dt>Account</dt>
+      <dd class="mono">{% if env_account %}{{ env_account }}{% else %}—{% endif %}</dd>
+    </div>
+    <div>
+      <dt>Region</dt>
+      <dd class="mono">{% if env_region %}{{ env_region }}{% else %}—{% endif %}</dd>
+    </div>
+    {% if env_cluster %}
+    <div>
+      <dt>Cluster</dt>
+      <dd class="mono">{{ env_cluster }}</dd>
+    </div>
+    {% endif %}
+    <div>
+      <dt>App</dt>
+      <dd class="mono" id="hero-version">{{ version }}</dd>
+    </div>
+  </dl>
+</section>
+
+<section class="ops-links" aria-label="Platform services for {{ selected_environment }}" data-filter-section="services">
+  <h2 class="section-label">Platform services · {{ selected_environment }}</h2>
+  {% if services %}
+  <div class="tool-table-wrap">
+    <table class="tool-table" id="services-table">
+      <thead>
+        <tr>
+          <th scope="col">
+            <span class="th-with-search" data-search-field="tool">
+              <span class="th-label">Tool</span>
+              <button type="button" class="col-search-btn" aria-label="Search tools" title="Search tools">
+                <svg class="col-search-icon" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+                  <circle cx="6.5" cy="6.5" r="4.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+                  <path d="M10.2 10.2 L14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </button>
+              <input
+                type="search"
+                class="col-search-input"
+                placeholder="Filter…"
+                autocomplete="off"
+                spellcheck="false"
+                hidden
+              >
+            </span>
+          </th>
+          <th scope="col">Description</th>
+          <th scope="col">Version</th>
+          <th scope="col">
+            <span class="th-with-search" data-search-field="url">
+              <span class="th-label">URL</span>
+              <button type="button" class="col-search-btn" aria-label="Search URLs" title="Search URLs">
+                <svg class="col-search-icon" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+                  <circle cx="6.5" cy="6.5" r="4.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+                  <path d="M10.2 10.2 L14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </button>
+              <input
+                type="search"
+                class="col-search-input"
+                placeholder="Filter…"
+                autocomplete="off"
+                spellcheck="false"
+                hidden
+              >
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ link_rows(services, environment, version_probe=true) }}
+      </tbody>
+    </table>
+  </div>
+  <p class="muted filter-empty" hidden>No services match this search.</p>
+  {% else %}
+  <p class="muted">No platform services for this environment.</p>
+  {% endif %}
+</section>
+
+<section class="ops-links products" aria-label="Team products for {{ selected_environment }}" data-filter-section="products">
+  <h2 class="section-label">Team products · {{ selected_environment }}</h2>
+  {% if products %}
+  <div class="tool-table-wrap">
+    <table class="tool-table" id="products-table">
+      <thead>
+        <tr>
+          <th scope="col">
+            <span class="th-with-search" data-search-field="tool">
+              <span class="th-label">Product</span>
+              <button type="button" class="col-search-btn" aria-label="Search products" title="Search products">
+                <svg class="col-search-icon" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+                  <circle cx="6.5" cy="6.5" r="4.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+                  <path d="M10.2 10.2 L14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </button>
+              <input
+                type="search"
+                class="col-search-input"
+                placeholder="Filter…"
+                autocomplete="off"
+                spellcheck="false"
+                hidden
+              >
+            </span>
+          </th>
+          <th scope="col">Description</th>
+          <th scope="col">Version</th>
+          <th scope="col">
+            <span class="th-with-search" data-search-field="url">
+              <span class="th-label">URL</span>
+              <button type="button" class="col-search-btn" aria-label="Search URLs" title="Search URLs">
+                <svg class="col-search-icon" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+                  <circle cx="6.5" cy="6.5" r="4.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+                  <path d="M10.2 10.2 L14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </button>
+              <input
+                type="search"
+                class="col-search-input"
+                placeholder="Filter…"
+                autocomplete="off"
+                spellcheck="false"
+                hidden
+              >
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ link_rows(products, environment, version_probe=false) }}
+      </tbody>
+    </table>
+  </div>
+  <p class="muted filter-empty" hidden>No products match this search.</p>
+  {% else %}
+  <p class="muted">No products configured for this team and environment.</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,20 +1,20 @@
 # DevOps backoffice
 
-Free Kubernetes **ops landing**: one page for Argo CD, Grafana, VictoriaMetrics, Kibana, Jaeger, CI, ECR, AWS Console, and your Git remote — per environment.
+Free Kubernetes **ops landing** for teams: one instance, many teams, per-environment shortcuts to platform services (Argo CD, Grafana, VictoriaMetrics, Kibana, Jaeger, CI, ECR, AWS Console, Git) and each team's products.
 
 This is a **sibling product** to [Apply Path · AWS EKS](https://github.com/liveelement/apply-path-aws-eks). It is not part of the paid Apply Path tree.
 
 | Asset | Location |
 | --- | --- |
 | Source | https://github.com/liveelement/devops-backoffice |
-| Image | `ghcr.io/liveelement/devops-backoffice:0.1.0` |
+| Image | `ghcr.io/liveelement/devops-backoffice:0.2.0` |
 | License | MIT |
 
 ## Run locally
 
 ```bash
 export PYTHONPATH=src
-export LINKS_CONFIG_PATH=config/links.yaml
+export LINKS_CONFIG_PATH=config
 export OTEL_SDK_DISABLED=true
 python -c "from backoffice.app import create_app; create_app().run(host='127.0.0.1', port=8080)"
 ```
@@ -24,18 +24,42 @@ Or with Docker:
 ```bash
 docker run --rm -p 8080:8080 \
   -e OTEL_SDK_DISABLED=true \
-  -e LINKS_CONFIG_PATH=/config/links.yaml \
-  -v "$PWD/config/links.yaml:/config/links.yaml:ro" \
-  ghcr.io/liveelement/devops-backoffice:0.1.0
+  -e LINKS_CONFIG_PATH=/config \
+  -v "$PWD/config:/config:ro" \
+  ghcr.io/liveelement/devops-backoffice:0.2.0
 ```
 
-Open http://127.0.0.1:8080/
+Open http://127.0.0.1:8080/ (team picker) or http://127.0.0.1:8080/t/payments?env=dev
 
-## Configure links
+## Configure
 
-Edit `config/links.yaml` (or mount it and set `LINKS_CONFIG_PATH`). Use `/?env=dev` or `/?env=prod`. JSON: `GET /api/links?env=prod`.
+**Full guide:** [docs/CONFIGURATION.md](docs/CONFIGURATION.md) — layout, field reference, version discovery, credentials, merge rules, env vars, starter checklist.
 
-Replace `REPLACE_WITH_DOMAIN` and the example Git URL before you use this in a real cluster.
+Quick shape:
+
+```text
+config/
+  hub.yaml                 # title, defaults, order
+  environments/
+    dev.yaml               # platform services + metadata
+    prod.yaml
+  teams/
+    platform.yaml          # products / service overlays
+    payments.yaml
+```
+
+Set `LINKS_CONFIG_PATH` to that directory (or a single monolithic YAML). Flat ConfigMap keys work too: `environments.dev.yaml`, `teams.payments.yaml`. Hot-reload is on by default (`LINKS_CONFIG_RELOAD=true`).
+
+| Route | Purpose |
+| --- | --- |
+| `/` | Team picker |
+| `/t/<team>?env=` | Team landing (services + products) |
+| `/api/teams` | Team list |
+| `/api/links?team=&env=` | Merged JSON payload |
+| `/api/service-status?team=&env=` | Version discovery (config / http / kubernetes) |
+| `/api/config` | Config sources + reload status |
+
+Replace `REPLACE_WITH_DOMAIN` and example URLs before production.
 
 ## Observability hooks
 
@@ -47,10 +71,11 @@ Replace `REPLACE_WITH_DOMAIN` and the example Git URL before you use this in a r
 
 ## Deploy sketch
 
-Point a Deployment at `ghcr.io/liveelement/devops-backoffice:0.1.0`, mount your `links.yaml`, and expose via Service / Ingress / Gateway of your choice. Helm charts from private labs are not required for v0.
+Point a Deployment at `ghcr.io/liveelement/devops-backoffice:0.2.0`, mount the config directory (`LINKS_CONFIG_PATH=/config`), use the included ServiceAccount + RBAC if you want Kubernetes version discovery, and expose via Service / Ingress / Gateway of your choice. Helm charts from private labs are not required for v0. If you change the release namespace, update the `ClusterRoleBinding` subject namespace in `deploy/rbac.yaml`.
 
 ## Not included
 
+- Auth / per-team visibility
+- Credentialed Argo/Grafana APIs (HTTP probes are unauthenticated GETs)
 - Terraform / EKS bootstrap (see Apply Path)
-- Istio / Rollouts canary vehicle wiring from the private lab
 - Managed hosting

@@ -3,56 +3,340 @@ kind: ConfigMap
 metadata:
   name: devops-backoffice-links
 data:
-  links.yaml: |
+  hub.yaml: |
+    # Hub settings for multi-file landing config.
+    # Environments: config/environments/*.yaml
+    # Teams:        config/teams/*.yaml
+    # Point LINKS_CONFIG_PATH at this directory (or hub.yaml). Hot-reload is on by default.
     title: DevOps Operations Hub
-    subtitle: Daily links for GitOps, observability, cloud, and source control.
+    subtitle: Team landings for platform services and products across environments.
+    default_environment: dev
+    default_team: platform
+    environment_order:
+      - dev
+      - prod
+    team_order:
+      - platform
+      - payments
+      - checkout
+  environments.dev.yaml: |
+    label: Development
+    metadata:
+      type: dev
+      cloud: aws
+      account: '111111111111'
+      region: eu-central-1
+      cluster: lab-dev
+    services:
+    - id: argocd
+      label: Argo CD
+      category: gitops
+      url: http://127.0.0.1:8081
+      description: Application sync status and GitOps drift (port-forward).
+      version: 2.12.3
+      version_discovery:
+        - source: http
+          url: http://127.0.0.1:8081/api/version
+        - source: kubernetes
+          namespace: argocd
+          kind: Deployment
+          name: argocd-server
+          from: image_tag
+          container: argocd-server
+      external: true
+      credentials:
+        title: Argo CD initial admin
+        provider: eks
+        namespace: argocd
+        secret: argocd-initial-admin-secret
+        keys:
+          - password
+        commands:
+          - label: Password
+            command: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+          - label: Context hint
+            command: kubectl config use-context {{cluster}}
+        links:
+          - label: Secret in cluster docs
+            url: https://argo-cd.readthedocs.io/en/stable/getting_started/#4-login-using-the-cli
+    - id: grafana
+      label: Grafana
+      category: observability
+      url: http://127.0.0.1:3000
+      description: Metrics dashboards (port-forward).
+      version:
+        config: "11.2.0"
+        kubernetes:
+          namespace: observability
+          kind: Deployment
+          name: grafana
+          from: image_tag
+          container: grafana
+      external: true
+      credentials:
+        title: Grafana admin
+        provider: eks
+        namespace: observability
+        secret: grafana-admin
+        keys:
+          - admin-user
+          - admin-password
+        commands:
+          - label: Username
+            command: kubectl -n observability get secret grafana-admin -o jsonpath="{.data.admin-user}" | base64 -d
+          - label: Password
+            command: kubectl -n observability get secret grafana-admin -o jsonpath="{.data.admin-password}" | base64 -d
+        links:
+          - label: AWS account console
+            url: https://{{account}}.signin.aws.amazon.com/console?region={{region}}
+    - id: victoriametrics
+      label: VictoriaMetrics
+      category: observability
+      url: http://127.0.0.1:8428
+      description: Prometheus-compatible metrics API and UI (port-forward).
+      version: 1.103.0
+      external: true
+    - id: jaeger
+      label: Jaeger
+      category: observability
+      url: http://127.0.0.1:16686/
+      description: Distributed traces (port-forward).
+      version: '1.57'
+      external: true
+    - id: kibana
+      label: Kibana
+      category: observability
+      url: https://127.0.0.1:5601
+      description: Log UI (port-forward).
+      version: 8.15.0
+      external: true
+    - id: ci
+      label: CI
+      category: ci
+      url: https://github.com/example/platform/actions
+      description: Replace with your GitHub Actions, GitLab CI, or Jenkins URL.
+      external: true
+    - id: ecr
+      label: ECR
+      category: cloud
+      url: https://console.aws.amazon.com/ecr/repositories
+      description: Container images in Amazon ECR.
+      external: true
+    - id: aws-console
+      label: AWS Console
+      category: cloud
+      url: https://console.aws.amazon.com/
+      description: Cloud console for the account that owns the cluster.
+      external: true
+    - id: git
+      label: Git repository
+      category: other
+      url: https://github.com/example/platform
+      description: Replace with your platform Git remote.
+      external: true
+  environments.prod.yaml: |
+    label: Production
+    metadata:
+      type: prod
+      cloud: aws
+      account: '222222222222'
+      region: eu-central-1
+      cluster: prod-eks
+    services:
+    - id: argocd
+      label: Argo CD
+      category: gitops
+      url: https://argocd.REPLACE_WITH_DOMAIN
+      description: Production GitOps applications and sync status.
+      version: 2.12.3
+      version_discovery:
+        - source: http
+          url: https://argocd.REPLACE_WITH_DOMAIN/api/version
+        - source: kubernetes
+          namespace: argocd
+          kind: Deployment
+          name: argocd-server
+          from: image_tag
+          container: argocd-server
+      external: true
+      credentials:
+        title: Argo CD initial admin
+        provider: eks
+        namespace: argocd
+        secret: argocd-initial-admin-secret
+        keys:
+          - password
+        commands:
+          - label: Password
+            command: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+          - label: Context hint
+            command: kubectl config use-context {{cluster}}
+    - id: grafana
+      label: Grafana
+      category: observability
+      url: https://grafana.REPLACE_WITH_DOMAIN
+      description: Production metrics dashboards.
+      version:
+        config: "11.2.0"
+        kubernetes:
+          namespace: observability
+          kind: Deployment
+          name: grafana
+          from: image_tag
+          container: grafana
+      external: true
+      credentials:
+        title: Grafana admin
+        provider: eks
+        namespace: observability
+        secret: grafana-admin
+        keys:
+          - admin-user
+          - admin-password
+        commands:
+          - label: Username
+            command: kubectl -n observability get secret grafana-admin -o jsonpath="{.data.admin-user}" | base64 -d
+          - label: Password
+            command: kubectl -n observability get secret grafana-admin -o jsonpath="{.data.admin-password}" | base64 -d
+        links:
+          - label: AWS account console
+            url: https://{{account}}.signin.aws.amazon.com/console?region={{region}}
+    - id: victoriametrics
+      label: VictoriaMetrics
+      category: observability
+      url: https://vm.REPLACE_WITH_DOMAIN
+      description: Prometheus-compatible metrics API and UI.
+      version: 1.103.0
+      external: true
+    - id: jaeger
+      label: Jaeger
+      category: observability
+      url: https://jaeger.REPLACE_WITH_DOMAIN
+      description: Production distributed traces.
+      version: '1.57'
+      external: true
+    - id: kibana
+      label: Kibana
+      category: observability
+      url: https://kibana.REPLACE_WITH_DOMAIN
+      description: Production logs UI.
+      version: 8.15.0
+      external: true
+    - id: ci
+      label: CI
+      category: ci
+      url: https://github.com/example/platform/actions
+      description: Replace with your GitHub Actions, GitLab CI, or Jenkins URL.
+      external: true
+    - id: ecr
+      label: ECR
+      category: cloud
+      url: https://console.aws.amazon.com/ecr/repositories
+      description: Container images in Amazon ECR.
+      external: true
+    - id: aws-console
+      label: AWS Console
+      category: cloud
+      url: https://console.aws.amazon.com/
+      description: Cloud console for the production account.
+      external: true
+    - id: git
+      label: Git repository
+      category: other
+      url: https://github.com/example/platform
+      description: Replace with your platform Git remote.
+      external: true
+  teams.checkout.yaml: |
+    label: Checkout
+    description: Storefront checkout experience and related services.
     default_environment: dev
     environments:
       dev:
-        label: Development
-        links:
-          - id: argocd
-            label: Argo CD
-            url: http://127.0.0.1:8081
-            description: Application sync status and GitOps drift (port-forward).
-            external: true
-          - id: grafana
-            label: Grafana
-            url: http://127.0.0.1:3000
-            description: Metrics dashboards (port-forward).
-            external: true
-          - id: victoriametrics
-            label: VictoriaMetrics
-            url: http://127.0.0.1:8428
-            description: Prometheus-compatible metrics API and UI (port-forward).
-            external: true
-          - id: jaeger
-            label: Jaeger
-            url: http://127.0.0.1:16686/
-            description: Distributed traces (port-forward).
-            external: true
-          - id: kibana
-            label: Kibana
-            url: https://127.0.0.1:5601
-            description: Log UI (port-forward).
-            external: true
-          - id: ci
-            label: CI
-            url: https://github.com/example/platform/actions
-            description: Replace with your GitHub Actions, GitLab CI, or Jenkins URL.
-            external: true
-          - id: ecr
-            label: ECR
-            url: https://console.aws.amazon.com/ecr/repositories
-            description: Container images in Amazon ECR.
-            external: true
-          - id: aws-console
-            label: AWS Console
-            url: https://console.aws.amazon.com/
-            description: Cloud console for the account that owns the cluster.
-            external: true
-          - id: git
-            label: Git repository
-            url: https://github.com/example/platform
-            description: Replace with your platform Git remote.
-            external: true
+        products:
+        - id: checkout-web
+          label: Checkout Web
+          url: https://checkout.dev.example
+          description: Customer-facing checkout (dev).
+          version: 0.9.1
+          external: true
+        - id: checkout-bff
+          label: Checkout BFF
+          url: https://checkout-bff.dev.example
+          description: Backend-for-frontend for checkout.
+          version: 0.9.1
+          external: true
+      prod:
+        products:
+        - id: checkout-web
+          label: Checkout Web
+          url: https://checkout.REPLACE_WITH_DOMAIN
+          description: Customer-facing checkout (prod).
+          version: 0.9.0
+          external: true
+        - id: checkout-bff
+          label: Checkout BFF
+          url: https://checkout-bff.REPLACE_WITH_DOMAIN
+          description: Backend-for-frontend for checkout.
+          version: 0.9.0
+          external: true
+  teams.payments.yaml: |
+    label: Payments
+    description: Payments domain — APIs and admin surfaces per environment.
+    default_environment: dev
+    environments:
+      dev:
+        products:
+        - id: payments-api
+          label: Payments API
+          url: https://payments-api.dev.example
+          description: Core payments HTTP API (dev).
+          version: 1.4.2
+          external: true
+        - id: payments-admin
+          label: Payments Admin
+          url: https://payments-admin.dev.example
+          description: Operator UI for refunds and disputes.
+          version: 1.4.2
+          external: true
+        services:
+        - id: payments-runbook
+          label: Payments runbook
+          category: other
+          url: https://wiki.example/payments/runbook
+          description: Team on-call and incident runbook.
+          external: true
+      prod:
+        products:
+        - id: payments-api
+          label: Payments API
+          url: https://payments-api.REPLACE_WITH_DOMAIN
+          description: Core payments HTTP API (prod).
+          version: 1.4.0
+          external: true
+        - id: payments-admin
+          label: Payments Admin
+          url: https://payments-admin.REPLACE_WITH_DOMAIN
+          description: Operator UI for refunds and disputes.
+          version: 1.4.0
+          external: true
+  teams.platform.yaml: |
+    label: Platform
+    description: Shared platform tooling and day-2 operations.
+    default_environment: dev
+    environments:
+      dev:
+        products:
+        - id: backoffice
+          label: DevOps Backoffice
+          url: http://127.0.0.1:8080/
+          description: This landing (self-link for demos).
+          version: 0.2.0
+          external: false
+      prod:
+        products:
+        - id: backoffice
+          label: DevOps Backoffice
+          url: https://backoffice.REPLACE_WITH_DOMAIN/
+          description: This landing in production.
+          version: 0.2.0
+          external: true

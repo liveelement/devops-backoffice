@@ -1,0 +1,111 @@
+label: Production
+metadata:
+  type: prod
+  cloud: aws
+  account: '222222222222'
+  region: eu-central-1
+  cluster: prod-eks
+services:
+- id: argocd
+  label: Argo CD
+  category: gitops
+  url: https://argocd.REPLACE_WITH_DOMAIN
+  description: Production GitOps applications and sync status.
+  version: 2.12.3
+  version_discovery:
+    - source: http
+      url: https://argocd.REPLACE_WITH_DOMAIN/api/version
+    - source: kubernetes
+      namespace: argocd
+      kind: Deployment
+      name: argocd-server
+      from: image_tag
+      container: argocd-server
+  external: true
+  credentials:
+    title: Argo CD initial admin
+    provider: eks
+    namespace: argocd
+    secret: argocd-initial-admin-secret
+    keys:
+      - password
+    commands:
+      - label: Password
+        command: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+      - label: Context hint
+        command: kubectl config use-context {{cluster}}
+- id: grafana
+  label: Grafana
+  category: observability
+  url: https://grafana.REPLACE_WITH_DOMAIN
+  description: Production metrics dashboards.
+  version:
+    config: "11.2.0"
+    kubernetes:
+      namespace: observability
+      kind: Deployment
+      name: grafana
+      from: image_tag
+      container: grafana
+  external: true
+  credentials:
+    title: Grafana admin
+    provider: eks
+    namespace: observability
+    secret: grafana-admin
+    keys:
+      - admin-user
+      - admin-password
+    commands:
+      - label: Username
+        command: kubectl -n observability get secret grafana-admin -o jsonpath="{.data.admin-user}" | base64 -d
+      - label: Password
+        command: kubectl -n observability get secret grafana-admin -o jsonpath="{.data.admin-password}" | base64 -d
+    links:
+      - label: AWS account console
+        url: https://{{account}}.signin.aws.amazon.com/console?region={{region}}
+- id: victoriametrics
+  label: VictoriaMetrics
+  category: observability
+  url: https://vm.REPLACE_WITH_DOMAIN
+  description: Prometheus-compatible metrics API and UI.
+  version: 1.103.0
+  external: true
+- id: jaeger
+  label: Jaeger
+  category: observability
+  url: https://jaeger.REPLACE_WITH_DOMAIN
+  description: Production distributed traces.
+  version: '1.57'
+  external: true
+- id: kibana
+  label: Kibana
+  category: observability
+  url: https://kibana.REPLACE_WITH_DOMAIN
+  description: Production logs UI.
+  version: 8.15.0
+  external: true
+- id: ci
+  label: CI
+  category: ci
+  url: https://github.com/example/platform/actions
+  description: Replace with your GitHub Actions, GitLab CI, or Jenkins URL.
+  external: true
+- id: ecr
+  label: ECR
+  category: cloud
+  url: https://console.aws.amazon.com/ecr/repositories
+  description: Container images in Amazon ECR.
+  external: true
+- id: aws-console
+  label: AWS Console
+  category: cloud
+  url: https://console.aws.amazon.com/
+  description: Cloud console for the production account.
+  external: true
+- id: git
+  label: Git repository
+  category: other
+  url: https://github.com/example/platform
+  description: Replace with your platform Git remote.
+  external: true

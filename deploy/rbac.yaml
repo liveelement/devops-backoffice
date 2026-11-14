@@ -1,0 +1,26 @@
+# Read-only access for Kubernetes version discovery (image tag / label / annotation).
+# Narrow to Role + RoleBinding per namespace if you prefer least privilege.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: devops-backoffice-version-discovery
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets", "daemonsets"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: devops-backoffice-version-discovery
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: devops-backoffice-version-discovery
+subjects:
+  - kind: ServiceAccount
+    name: devops-backoffice
+    namespace: default

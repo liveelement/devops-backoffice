@@ -12,9 +12,10 @@ spec:
       labels:
         app.kubernetes.io/name: devops-backoffice
     spec:
+      serviceAccountName: devops-backoffice
       containers:
         - name: backoffice
-          image: ghcr.io/liveelement/devops-backoffice:0.1.0
+          image: ghcr.io/liveelement/devops-backoffice:0.2.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -23,9 +24,13 @@ spec:
             - name: OTEL_SDK_DISABLED
               value: "true"
             - name: LINKS_CONFIG_PATH
-              value: /config/links.yaml
+              value: /config
+            - name: LINKS_CONFIG_RELOAD
+              value: "true"
+            - name: K8S_VERSION_DISCOVERY
+              value: "true"
             - name: APP_VERSION
-              value: "0.1.0"
+              value: "0.2.0"
           volumeMounts:
             - name: links
               mountPath: /config

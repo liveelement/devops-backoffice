@@ -1,0 +1,16 @@
+# Hub settings for multi-file landing config.
+# Environments: config/environments/*.yaml
+# Teams:        config/teams/*.yaml
+# Point LINKS_CONFIG_PATH at this directory (or hub.yaml). Hot-reload is on by default.
+# Full reference: docs/CONFIGURATION.md
+title: DevOps Operations Hub
+subtitle: Team landings for platform services and products across environments.
+default_environment: dev
+default_team: platform
+environment_order:
+  - dev
+  - prod
+team_order:
+  - platform
+  - payments
+  - checkout

@@ -4,17 +4,50 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}DevOps Backoffice{% endblock %}</title>
+  <script>
+    (function () {
+      try {
+        var key = "devops-backoffice:theme";
+        var stored = localStorage.getItem(key);
+        var theme = stored === "light" || stored === "dark"
+          ? stored
+          : (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (e) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
-<body>
+<body
+  data-selected-env="{{ selected_environment or '' }}"
+  data-selected-team="{{ selected_team or '' }}"
+>
   <header class="site-header">
     <a class="brand" href="{{ url_for('index') }}">devops-backoffice</a>
     <nav>
-      <a href="{{ url_for('index', env=selected_environment) }}">Home</a>
-      <a href="{{ url_for('dashboard', env=selected_environment) }}">Dashboard</a>
-      <a href="{{ url_for('api_links', env=selected_environment) }}">Links API</a>
+      <a href="{{ url_for('index') }}">Teams</a>
+      {% if selected_team %}
+      <a href="{{ url_for('team_landing', team_id=selected_team, env=selected_environment) }}">Landing</a>
+      <a href="{{ url_for('api_links', team=selected_team, env=selected_environment) }}">Links API</a>
+      {% else %}
+      <a href="{{ url_for('api_teams') }}">Teams API</a>
+      {% endif %}
     </nav>
-    <span class="version-pill" id="version-pill" data-version="{{ version }}">v{{ version }}</span>
+    <div class="header-actions">
+      <button
+        type="button"
+        class="theme-toggle"
+        id="theme-toggle"
+        aria-label="Toggle color theme"
+        title="Toggle dark / light theme"
+      >
+        <span class="theme-icon" aria-hidden="true"></span>
+        <span class="theme-label">Theme</span>
+      </button>
+      <span class="version-pill" id="version-pill" data-version="{{ version }}">v{{ version }}</span>
+    </div>
   </header>
   <main>
     {% block content %}{% endblock %}

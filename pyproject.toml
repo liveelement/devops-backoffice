@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "devops-backoffice"
-version = "0.1.0"
-description = "Free Kubernetes ops landing — Argo CD, Grafana, Jaeger, Kibana, and env links"
+version = "0.2.0"
+description = "Free multi-team Kubernetes ops landing — services, products, and env links"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -37,7 +37,14 @@ Repository = "https://github.com/liveelement/devops-backoffice"
 where = ["src"]
 
 [tool.setuptools.package-data]
-backoffice = ["templates/*.html", "static/css/*", "static/js/*", "config/*.yaml"]
+backoffice = [
+  "templates/*.html",
+  "static/css/*",
+  "static/js/*",
+  "config/*.yaml",
+  "config/environments/*.yaml",
+  "config/teams/*.yaml",
+]
 
 [tool.ruff]
 line-length = 100
