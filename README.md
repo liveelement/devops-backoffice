@@ -2,7 +2,7 @@
 
 Free Kubernetes **ops landing** for teams: one instance, many teams, per-environment shortcuts to platform services (Argo CD, Grafana, VictoriaMetrics, Kibana, Jaeger, CI, ECR, AWS Console, Git) and each team's products.
 
-This is a **sibling product** to [Apply Path · AWS EKS](https://github.com/liveelement/apply-path-aws-eks). It is not part of the paid Apply Path tree.
+This is a **sibling product** to [Apply Path Â· AWS EKS](https://github.com/liveelement/apply-path-aws-eks). It is not part of the paid Apply Path tree.
 
 | Asset | Location |
 | --- | --- |
@@ -33,7 +33,7 @@ Open http://127.0.0.1:8080/ (team picker) or http://127.0.0.1:8080/t/payments?en
 
 ## Configure
 
-**Full guide:** [docs/CONFIGURATION.md](docs/CONFIGURATION.md) — layout, field reference, version discovery, credentials, merge rules, env vars, starter checklist.
+**Full guide:** [docs/CONFIGURATION.md](docs/CONFIGURATION.md) - layout, field reference, version discovery, credentials, merge rules, env vars, starter checklist.
 
 Quick shape:
 

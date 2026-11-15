@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "devops-backoffice"
 version = "0.3.0"
-description = "Free multi-team Kubernetes ops landing — services, products, and env links"
+description = "Free multi-team Kubernetes ops landing - services, products, and env links"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
