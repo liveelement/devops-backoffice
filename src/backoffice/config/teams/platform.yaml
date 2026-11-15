@@ -6,15 +6,17 @@ environments:
     products:
     - id: backoffice
       label: DevOps Backoffice
+      icon: hub
       url: http://127.0.0.1:8080/
       description: This landing (self-link for demos).
-      version: 0.2.0
+      version: 0.3.0
       external: false
   prod:
     products:
     - id: backoffice
       label: DevOps Backoffice
+      icon: hub
       url: https://backoffice.REPLACE_WITH_DOMAIN/
       description: This landing in production.
-      version: 0.2.0
+      version: 0.3.0
       external: true

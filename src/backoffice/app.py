@@ -11,9 +11,10 @@ from backoffice.config import LandingConfigStore
 from backoffice.logging_setup import configure_logging
 from backoffice.metrics import setup_metrics
 from backoffice.discovery import resolve_service_versions
+from backoffice.icons import list_icons
 from backoffice.telemetry import setup_telemetry
 
-APP_VERSION = os.environ.get("APP_VERSION", "0.2.0")
+APP_VERSION = os.environ.get("APP_VERSION", "0.3.0")
 PACKAGE_ROOT = Path(__file__).resolve().parent
 logger = logging.getLogger("backoffice")
 
@@ -196,6 +197,11 @@ def create_app():
         """Config source fingerprint / reload status (ops debugging)."""
         return jsonify(app.config["LANDING_STORE"].status())
 
+    @app.get("/api/icons")
+    def api_icons():
+        """Curated icon keys for service/product `icon:` / `logo:` fields."""
+        return jsonify({"icons": list_icons()})
+
     @app.get("/")
     def index():
         if _lab_force_5xx():
@@ -227,7 +233,7 @@ def create_app():
         cfg = current_landing()
         team = cfg.resolve_team(team_id)
         if team is None or team.id != team_id.strip().lower():
-            # Unknown team → home
+            # Unknown team > home
             return redirect(url_for("index"))
         env_name = _selected_env_name(cfg, team)
         team, environment, services, products = cfg.resolve_view(team.id, env_name)

@@ -6,12 +6,14 @@ environments:
     products:
     - id: checkout-web
       label: Checkout Web
+      icon: web
       url: https://checkout.dev.example
       description: Customer-facing checkout (dev).
       version: 0.9.1
       external: true
     - id: checkout-bff
       label: Checkout BFF
+      icon: api
       url: https://checkout-bff.dev.example
       description: Backend-for-frontend for checkout.
       version: 0.9.1
@@ -20,12 +22,14 @@ environments:
     products:
     - id: checkout-web
       label: Checkout Web
+      icon: web
       url: https://checkout.REPLACE_WITH_DOMAIN
       description: Customer-facing checkout (prod).
       version: 0.9.0
       external: true
     - id: checkout-bff
       label: Checkout BFF
+      icon: api
       url: https://checkout-bff.REPLACE_WITH_DOMAIN
       description: Backend-for-frontend for checkout.
       version: 0.9.0

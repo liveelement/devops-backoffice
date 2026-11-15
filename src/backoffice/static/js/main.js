@@ -186,19 +186,22 @@
 
       let active = null;
 
-      function syncCredsPanels() {
-        table.querySelectorAll("tr.link-row[data-has-creds]").forEach((row) => {
+      function syncHintPanels() {
+        table.querySelectorAll("tr.link-row").forEach((row) => {
+          if (!row.hidden) return;
           const id = row.dataset.serviceId;
-          const panel = id ? table.querySelector(`tr.creds-panel-row[data-creds-for="${CSS.escape(id)}"]`) : null;
-          if (!panel) return;
-          if (row.hidden) {
-            panel.hidden = true;
-            const toggle = row.querySelector(".creds-toggle");
-            if (toggle) {
-              toggle.classList.remove("is-open");
-              toggle.setAttribute("aria-expanded", "false");
-            }
-          }
+          if (!id) return;
+          table
+            .querySelectorAll(
+              `tr.hint-panel-row[data-creds-for="${CSS.escape(id)}"], tr.hint-panel-row[data-pf-for="${CSS.escape(id)}"]`
+            )
+            .forEach((panel) => {
+              panel.hidden = true;
+            });
+          row.querySelectorAll(".hint-toggle").forEach((toggle) => {
+            toggle.classList.remove("is-open");
+            toggle.setAttribute("aria-expanded", "false");
+          });
         });
       }
 
@@ -206,7 +209,7 @@
         table.querySelectorAll("tbody tr.link-row").forEach((row) => {
           row.hidden = false;
         });
-        syncCredsPanels();
+        syncHintPanels();
         if (empty) empty.hidden = true;
       }
 
@@ -227,7 +230,7 @@
           row.hidden = !match;
           if (match) visible += 1;
         });
-        syncCredsPanels();
+        syncHintPanels();
         if (empty) empty.hidden = !query || visible > 0;
       }
 
@@ -288,20 +291,19 @@
     });
   }
 
-  function setupCredentialsPanels() {
-    document.querySelectorAll(".creds-toggle").forEach((btn) => {
+  function setupHintPanels() {
+    document.querySelectorAll(".hint-toggle").forEach((btn) => {
       btn.addEventListener("click", () => {
         const controls = btn.getAttribute("aria-controls");
         const panel = controls ? document.getElementById(controls) : null;
         if (!panel) return;
         const open = panel.hidden;
-        // Close other panels in the same table.
         const table = btn.closest("table");
         if (table) {
-          table.querySelectorAll(".creds-panel-row").forEach((row) => {
+          table.querySelectorAll(".hint-panel-row").forEach((row) => {
             row.hidden = true;
           });
-          table.querySelectorAll(".creds-toggle").forEach((other) => {
+          table.querySelectorAll(".hint-toggle").forEach((other) => {
             other.classList.remove("is-open");
             other.setAttribute("aria-expanded", "false");
           });
@@ -337,10 +339,10 @@
 
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
-      document.querySelectorAll(".creds-panel-row").forEach((row) => {
+      document.querySelectorAll(".hint-panel-row").forEach((row) => {
         row.hidden = true;
       });
-      document.querySelectorAll(".creds-toggle.is-open").forEach((btn) => {
+      document.querySelectorAll(".hint-toggle.is-open").forEach((btn) => {
         btn.classList.remove("is-open");
         btn.setAttribute("aria-expanded", "false");
       });
@@ -348,7 +350,7 @@
   }
 
   setupColumnSearch();
-  setupCredentialsPanels();
+  setupHintPanels();
   loadAppVersion();
   loadServiceStatus();
 })();

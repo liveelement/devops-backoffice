@@ -6,6 +6,8 @@ from pathlib import Path
 
 import yaml
 
+from backoffice.icons import resolve_icon
+
 logger = logging.getLogger(__name__)
 
 _PACKAGE_CONFIG_DIR = Path(__file__).resolve().parent
@@ -99,6 +101,127 @@ class CredentialRef:
         )
 
 
+class PortForwardRef:
+    """Copy-paste kubectl port-forward hint — never opens tunnels itself."""
+
+    def __init__(
+        self,
+        title="",
+        namespace="",
+        resource="",
+        local_port="",
+        remote_port="",
+        address="127.0.0.1",
+        cluster="",
+        commands=None,
+    ):
+        self.title = title
+        self.namespace = namespace
+        self.resource = resource  # e.g. svc/argocd-server
+        self.local_port = str(local_port or "").strip()
+        self.remote_port = str(remote_port or "").strip()
+        self.address = address or "127.0.0.1"
+        self.cluster = cluster
+        self.commands = list(commands or [])  # [{label, command}]
+
+    @property
+    def ports(self):
+        if self.local_port and self.remote_port:
+            return f"{self.local_port}:{self.remote_port}"
+        return self.local_port or self.remote_port or ""
+
+    @property
+    def location(self):
+        if self.namespace and self.resource:
+            return f"{self.namespace}/{self.resource}"
+        return self.resource or self.namespace or ""
+
+    def to_dict(self):
+        return {
+            "title": self.title,
+            "namespace": self.namespace,
+            "resource": self.resource,
+            "local_port": self.local_port,
+            "remote_port": self.remote_port,
+            "ports": self.ports,
+            "address": self.address,
+            "cluster": self.cluster,
+            "location": self.location,
+            "commands": [dict(item) for item in self.commands],
+        }
+
+    def rendered(self, environment=None):
+        meta = environment.metadata_dict() if environment is not None else {}
+        cluster = self.cluster or meta.get("cluster") or ""
+        namespace = self.namespace or ""
+        resource = self.resource or ""
+        address = self.address or "127.0.0.1"
+        ports = self.ports
+        ctx = {
+            "cluster": cluster,
+            "region": meta.get("region") or "",
+            "account": meta.get("account") or "",
+            "cloud": meta.get("cloud") or "",
+            "type": meta.get("type") or "",
+            "namespace": namespace,
+            "resource": resource,
+            "local_port": self.local_port or "",
+            "remote_port": self.remote_port or "",
+            "ports": ports,
+            "address": address,
+        }
+
+        def fill(text):
+            out = str(text or "")
+            for key, value in ctx.items():
+                out = out.replace("{{" + key + "}}", value)
+            return out
+
+        namespace = fill(namespace)
+        resource = fill(resource)
+        cluster = fill(cluster)
+        commands = [
+            {
+                "label": item.get("label", "Port-forward"),
+                "command": fill(item.get("command", "")).strip(),
+            }
+            for item in self.commands
+            if str(item.get("command") or "").strip()
+        ]
+        if not commands and namespace and resource and ports:
+            addr_flag = f" --address {address}" if address else ""
+            commands = [
+                {
+                    "label": "Port-forward",
+                    "command": (
+                        f"kubectl -n {namespace} port-forward{addr_flag} "
+                        f"{resource} {ports}"
+                    ),
+                }
+            ]
+        has_context = any(
+            "config use-context" in (item.get("command") or "") for item in commands
+        )
+        if cluster and not has_context:
+            commands = [
+                {
+                    "label": "Context hint",
+                    "command": f"kubectl config use-context {cluster}",
+                }
+            ] + commands
+
+        return PortForwardRef(
+            title=fill(self.title) or "Port-forward",
+            namespace=namespace,
+            resource=resource,
+            local_port=self.local_port,
+            remote_port=self.remote_port,
+            address=address,
+            cluster=cluster,
+            commands=commands,
+        )
+
+
 class VersionSource:
     """One way to resolve a service/product version (config | http | kubernetes)."""
 
@@ -128,7 +251,9 @@ class OpsLink:
         version="",
         version_url="",
         kind="service",
+        icon="",
         credentials=None,
+        port_forward=None,
         version_sources=None,
     ):
         self.id = id
@@ -140,7 +265,9 @@ class OpsLink:
         self.version = version
         self.version_url = version_url  # legacy alias for http discovery
         self.kind = kind  # service | product
+        self.icon = icon or "tool"  # catalog key from backoffice.icons
         self.credentials = credentials  # CredentialRef | None
+        self.port_forward = port_forward  # PortForwardRef | None
         self.version_sources = list(version_sources or [])  # list[VersionSource]
 
     def has_live_version_discovery(self):
@@ -150,6 +277,9 @@ class OpsLink:
         creds = None
         if self.credentials is not None:
             creds = self.credentials.rendered(environment).to_dict()
+        pf = None
+        if self.port_forward is not None:
+            pf = self.port_forward.rendered(environment).to_dict()
         return {
             "id": self.id,
             "label": self.label,
@@ -161,13 +291,20 @@ class OpsLink:
             "version_url": self.version_url,
             "version_sources": [src.to_dict() for src in self.version_sources],
             "kind": self.kind,
+            "icon": self.icon,
             "credentials": creds,
+            "port_forward": pf,
         }
 
     def credentials_view(self, environment=None):
         if self.credentials is None:
             return None
         return self.credentials.rendered(environment)
+
+    def port_forward_view(self, environment=None):
+        if self.port_forward is None:
+            return None
+        return self.port_forward.rendered(environment)
 
 
 _ENV_TYPES = ("dev", "qa", "uat", "prod")
@@ -407,6 +544,73 @@ def _parse_credentials(raw):
     )
 
 
+def _parse_ports_pair(raw):
+    """Parse '8081:443' or {local, remote} into (local, remote)."""
+    if isinstance(raw, dict):
+        local = str(raw.get("local") or raw.get("local_port") or "").strip()
+        remote = str(raw.get("remote") or raw.get("remote_port") or "").strip()
+        return local, remote
+    text = str(raw or "").strip()
+    if ":" in text:
+        left, right = text.split(":", 1)
+        return left.strip(), right.strip()
+    if text.isdigit():
+        return text, text
+    return "", ""
+
+
+def _parse_port_forward(raw):
+    """
+    Optional port-forward cheat-sheet on a service/product.
+
+      port_forward:
+        namespace: argocd
+        service: argocd-server          # → svc/argocd-server
+        # or resource: svc/argocd-server
+        ports: "8081:443"               # local:remote
+        address: 127.0.0.1              # optional
+        commands:                       # optional overrides
+          - label: Port-forward
+            command: kubectl -n {{namespace}} port-forward {{resource}} {{address}}:{{ports}}
+    """
+    if not isinstance(raw, dict):
+        return None
+    title = str(raw.get("title") or "").strip()
+    namespace = str(raw.get("namespace") or "").strip()
+    cluster = str(raw.get("cluster") or "").strip()
+    address = str(raw.get("address") or "127.0.0.1").strip() or "127.0.0.1"
+    resource = str(raw.get("resource") or "").strip()
+    if not resource:
+        service = str(raw.get("service") or raw.get("svc") or "").strip()
+        deployment = str(raw.get("deployment") or "").strip()
+        pod = str(raw.get("pod") or "").strip()
+        if service:
+            resource = service if "/" in service else f"svc/{service}"
+        elif deployment:
+            resource = deployment if "/" in deployment else f"deployment/{deployment}"
+        elif pod:
+            resource = pod if "/" in pod else f"pod/{pod}"
+    local_port = str(raw.get("local_port") or "").strip()
+    remote_port = str(raw.get("remote_port") or "").strip()
+    if not (local_port and remote_port):
+        parsed_local, parsed_remote = _parse_ports_pair(raw.get("ports") or raw.get("port"))
+        local_port = local_port or parsed_local
+        remote_port = remote_port or parsed_remote
+    commands = _parse_credential_commands(raw.get("commands"))
+    if not (commands or (namespace and resource and local_port and remote_port)):
+        return None
+    return PortForwardRef(
+        title=title or "Port-forward",
+        namespace=namespace,
+        resource=resource,
+        local_port=local_port,
+        remote_port=remote_port,
+        address=address,
+        cluster=cluster,
+        commands=commands,
+    )
+
+
 def _http_source_from_mapping(body, default_url=""):
     if not isinstance(body, dict):
         if isinstance(body, str) and body.strip():
@@ -558,6 +762,11 @@ def _parse_link(raw, index, default_kind="service"):
     if kind not in {"service", "product"}:
         kind = default_kind
     declared, version_url, version_sources = _parse_version_sources(raw)
+    icon = resolve_icon(
+        raw_icon=str(raw.get("icon") or raw.get("logo") or ""),
+        link_id=link_id,
+        category=category,
+    )
     return OpsLink(
         id=link_id,
         label=label,
@@ -568,7 +777,11 @@ def _parse_link(raw, index, default_kind="service"):
         version=declared,
         version_url=version_url,
         kind=kind,
+        icon=icon,
         credentials=_parse_credentials(raw.get("credentials")),
+        port_forward=_parse_port_forward(
+            raw.get("port_forward") or raw.get("portforward") or raw.get("port_fwd")
+        ),
         version_sources=version_sources,
     )
 

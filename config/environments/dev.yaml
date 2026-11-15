@@ -8,6 +8,7 @@ metadata:
 services:
 - id: argocd
   label: Argo CD
+  icon: argocd
   category: gitops
   url: http://127.0.0.1:8081
   description: Application sync status and GitOps drift (port-forward).
@@ -22,6 +23,11 @@ services:
       from: image_tag
       container: argocd-server
   external: true
+  port_forward:
+    title: Port-forward Argo CD UI
+    namespace: argocd
+    service: argocd-server
+    ports: "8081:443"
   credentials:
     title: Argo CD initial admin
     provider: eks
@@ -39,6 +45,7 @@ services:
         url: https://argo-cd.readthedocs.io/en/stable/getting_started/#4-login-using-the-cli
 - id: grafana
   label: Grafana
+  icon: grafana
   category: observability
   url: http://127.0.0.1:3000
   description: Metrics dashboards (port-forward).
@@ -51,6 +58,11 @@ services:
       from: image_tag
       container: grafana
   external: true
+  port_forward:
+    title: Port-forward Grafana
+    namespace: observability
+    service: grafana
+    ports: "3000:80"
   credentials:
     title: Grafana admin
     provider: eks
@@ -69,45 +81,67 @@ services:
         url: https://{{account}}.signin.aws.amazon.com/console?region={{region}}
 - id: victoriametrics
   label: VictoriaMetrics
+  icon: victoria
   category: observability
   url: http://127.0.0.1:8428
   description: Prometheus-compatible metrics API and UI (port-forward).
   version: 1.103.0
   external: true
+  port_forward:
+    title: Port-forward VictoriaMetrics
+    namespace: observability
+    service: victoria-metrics
+    ports: "8428:8428"
 - id: jaeger
   label: Jaeger
+  icon: jaeger
   category: observability
   url: http://127.0.0.1:16686/
   description: Distributed traces (port-forward).
   version: '1.57'
   external: true
+  port_forward:
+    title: Port-forward Jaeger UI
+    namespace: observability
+    service: jaeger-query
+    ports: "16686:16686"
 - id: kibana
   label: Kibana
+  icon: kibana
   category: observability
   url: https://127.0.0.1:5601
   description: Log UI (port-forward).
   version: 8.15.0
   external: true
+  port_forward:
+    title: Port-forward Kibana
+    namespace: observability
+    service: kibana
+    ports: "5601:5601"
 - id: ci
   label: CI
+  icon: github
   category: ci
   url: https://github.com/example/platform/actions
   description: Replace with your GitHub Actions, GitLab CI, or Jenkins URL.
   external: true
 - id: ecr
   label: ECR
+  icon: ecr
   category: cloud
   url: https://console.aws.amazon.com/ecr/repositories
   description: Container images in Amazon ECR.
   external: true
 - id: aws-console
   label: AWS Console
+  icon: aws
   category: cloud
   url: https://console.aws.amazon.com/
   description: Cloud console for the account that owns the cluster.
   external: true
 - id: git
   label: Git repository
+  icon: git
   category: other
   url: https://github.com/example/platform
   description: Replace with your platform Git remote.

@@ -1,5 +1,5 @@
 # Build from this directory:
-#   docker build -t ghcr.io/liveelement/devops-backoffice:0.2.0 .
+#   docker build -t ghcr.io/liveelement/devops-backoffice:0.3.0 .
 FROM python:3.12-slim AS build
 WORKDIR /app
 COPY pyproject.toml README.md ./
@@ -11,7 +11,7 @@ FROM python:3.12-slim AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PORT=8080 \
-    APP_VERSION=0.2.0 \
+    APP_VERSION=0.3.0 \
     OTEL_SERVICE_NAME=devops-backoffice \
     PROMETHEUS_MULTIPROC_DIR=/var/prometheus
 RUN useradd --create-home --uid 10001 appuser \

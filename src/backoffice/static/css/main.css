@@ -403,10 +403,27 @@ main {
 .tool-cell {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
-.creds-toggle {
+.tool-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 0.3rem;
+  /* Single calm tint — shape carries identity, not brand colours */
+  color: color-mix(in srgb, var(--text) 62%, var(--muted));
+  background: color-mix(in srgb, var(--muted) 10%, transparent);
+}
+
+.tool-icon svg {
+  display: block;
+}
+
+.hint-toggle {
   appearance: none;
   border: 0;
   background: transparent;
@@ -418,25 +435,25 @@ main {
   opacity: 0.65;
 }
 
-.creds-toggle:hover,
-.creds-toggle:focus-visible,
-.creds-toggle.is-open {
+.hint-toggle:hover,
+.hint-toggle:focus-visible,
+.hint-toggle.is-open {
   color: var(--accent-2);
   opacity: 1;
   outline: none;
   background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
-.creds-icon {
+.hint-icon {
   display: block;
 }
 
-.creds-panel-row td {
+.hint-panel-row td {
   padding: 0 0.65rem 0.75rem;
   border-bottom: 1px solid var(--border);
 }
 
-.creds-panel {
+.hint-panel {
   margin-top: 0.15rem;
   padding: 0.75rem 0.85rem;
   border: 1px solid var(--border);
@@ -444,7 +461,7 @@ main {
   background: color-mix(in srgb, var(--bg) 55%, var(--surface));
 }
 
-.creds-panel-head {
+.hint-panel-head {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -452,7 +469,7 @@ main {
   margin-bottom: 0.55rem;
 }
 
-.creds-location {
+.hint-location {
   font-size: 0.85rem;
 }
 
@@ -464,7 +481,7 @@ main {
   border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
 }
 
-.creds-keys {
+.hint-keys {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
@@ -481,7 +498,7 @@ main {
   color: var(--muted);
 }
 
-.creds-commands {
+.hint-commands {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -490,7 +507,7 @@ main {
   gap: 0.55rem;
 }
 
-.creds-command-meta {
+.hint-command-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -529,7 +546,7 @@ main {
   border-color: color-mix(in srgb, var(--accent-2) 45%, var(--border));
 }
 
-.creds-command {
+.hint-command {
   margin: 0;
   padding: 0.5rem 0.65rem;
   border-radius: 0.35rem;
@@ -540,7 +557,7 @@ main {
   line-height: 1.4;
 }
 
-.creds-command code {
+.hint-command code {
   background: transparent;
   padding: 0;
   font-family: ui-monospace, Consolas, monospace;
@@ -549,25 +566,25 @@ main {
   word-break: break-word;
 }
 
-.creds-links {
+.hint-links {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-top: 0.65rem;
 }
 
-.creds-links a {
+.hint-links a {
   color: var(--accent-2);
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
 }
 
-.creds-links a:hover {
+.hint-links a:hover {
   text-decoration: underline;
 }
 
-.creds-note {
+.hint-note {
   margin: 0.65rem 0 0;
   font-size: 0.78rem;
 }
@@ -739,7 +756,7 @@ main {
 }
 
 .tool-table td:first-child {
-  width: 9.5rem;
+  width: 11.5rem;
   white-space: nowrap;
 }
 

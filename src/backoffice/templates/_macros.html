@@ -1,29 +1,66 @@
+{% from "_icons.html" import service_icon %}
+
 {% macro creds_icon() -%}
-<svg class="creds-icon" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+<svg class="hint-icon" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
   <path d="M8 1.5a3 3 0 0 0-1.2 5.75V9.5h-1.3v1.5h1.3V13h1.8v-2h1.3V9.5H8.6V7.25A3 3 0 0 0 8 1.5zm0 1.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="currentColor"/>
 </svg>
 {%- endmacro %}
 
+{% macro pf_icon() -%}
+<svg class="hint-icon" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+  <path d="M2.5 3.5h4.2v1.6H4.1v5.8h2.6v1.6H2.5V3.5zm6.8 0H13.5v9H9.3v-1.6h2.6V5.1H9.3V3.5z" fill="currentColor"/>
+  <path d="M6.2 7.2h3.6v1.6H6.2z" fill="currentColor"/>
+</svg>
+{%- endmacro %}
+
+{% macro hint_commands(items) %}
+{% if items %}
+<ul class="hint-commands">
+  {% for item in items %}
+  <li>
+    <div class="hint-command-meta">
+      <span>{{ item.label }}</span>
+      <button type="button" class="copy-btn" data-copy="{{ item.command|e }}">Copy</button>
+    </div>
+    <pre class="hint-command"><code>{{ item.command }}</code></pre>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endmacro %}
+
 {% macro link_rows(links, environment, version_probe=false) %}
 {% for link in links %}
 {% set creds = link.credentials_view(environment) %}
+{% set pf = link.port_forward_view(environment) %}
 <tr
   class="link-row"
   data-service-id="{{ link.id }}"
   data-filter-tool="{{ (link.label ~ ' ' ~ link.description ~ ' ' ~ link.id)|e }}"
   data-filter-url="{{ link.url|e }}"
   {% if creds %}data-has-creds="1"{% endif %}
+  {% if pf %}data-has-pf="1"{% endif %}
 >
   <td>
     <span class="tool-cell">
+      {{ service_icon(link.icon) }}
       <a
         href="{{ link.url }}"
         {% if link.external %}target="_blank" rel="noopener noreferrer"{% endif %}
       >{{ link.label }}</a>
+      {% if pf %}
+      <button
+        type="button"
+        class="hint-toggle pf-toggle"
+        aria-expanded="false"
+        aria-controls="pf-{{ link.id }}"
+        title="Port-forward cheat-sheet"
+      >{{ pf_icon() }}</button>
+      {% endif %}
       {% if creds %}
       <button
         type="button"
-        class="creds-toggle"
+        class="hint-toggle creds-toggle"
         aria-expanded="false"
         aria-controls="creds-{{ link.id }}"
         title="Credentials cheat-sheet (no values fetched)"
@@ -53,48 +90,59 @@
     >{{ link.url }}</a>
   </td>
 </tr>
-{% if creds %}
-<tr class="creds-panel-row" id="creds-{{ link.id }}" hidden data-creds-for="{{ link.id }}">
+{% if pf %}
+<tr class="hint-panel-row pf-panel-row" id="pf-{{ link.id }}" hidden data-pf-for="{{ link.id }}">
   <td colspan="4">
-    <div class="creds-panel">
-      <div class="creds-panel-head">
+    <div class="hint-panel">
+      <div class="hint-panel-head">
+        <strong>{{ pf.title }}</strong>
+        <span class="meta-pill meta-provider">port-forward</span>
+        {% if pf.location %}
+        <span class="mono hint-location">{{ pf.location }}</span>
+        {% endif %}
+        {% if pf.ports %}
+        <span class="mono muted">· {{ pf.address }}:{{ pf.ports }}</span>
+        {% endif %}
+        {% if pf.cluster %}
+        <span class="muted mono">· {{ pf.cluster }}</span>
+        {% endif %}
+      </div>
+      {{ hint_commands(pf.commands) }}
+      <p class="hint-note muted">Backoffice does not open tunnels — run the command in your terminal, then open the local URL.</p>
+    </div>
+  </td>
+</tr>
+{% endif %}
+{% if creds %}
+<tr class="hint-panel-row creds-panel-row" id="creds-{{ link.id }}" hidden data-creds-for="{{ link.id }}">
+  <td colspan="4">
+    <div class="hint-panel">
+      <div class="hint-panel-head">
         <strong>{{ creds.title }}</strong>
         <span class="meta-pill meta-provider">{{ creds.provider }}</span>
         {% if creds.location %}
-        <span class="mono creds-location">{{ creds.location }}</span>
+        <span class="mono hint-location">{{ creds.location }}</span>
         {% endif %}
         {% if creds.cluster %}
         <span class="muted mono">· {{ creds.cluster }}</span>
         {% endif %}
       </div>
       {% if creds.keys %}
-      <div class="creds-keys" aria-label="Secret keys">
+      <div class="hint-keys" aria-label="Secret keys">
         {% for key in creds.keys %}
         <span class="key-chip">{{ key }}</span>
         {% endfor %}
       </div>
       {% endif %}
-      {% if creds.commands %}
-      <ul class="creds-commands">
-        {% for item in creds.commands %}
-        <li>
-          <div class="creds-command-meta">
-            <span>{{ item.label }}</span>
-            <button type="button" class="copy-btn" data-copy="{{ item.command|e }}">Copy</button>
-          </div>
-          <pre class="creds-command"><code>{{ item.command }}</code></pre>
-        </li>
-        {% endfor %}
-      </ul>
-      {% endif %}
+      {{ hint_commands(creds.commands) }}
       {% if creds.links %}
-      <div class="creds-links">
+      <div class="hint-links">
         {% for item in creds.links %}
         <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.label }}</a>
         {% endfor %}
       </div>
       {% endif %}
-      <p class="creds-note muted">Backoffice does not fetch secrets — run the command in your terminal or open an external link.</p>
+      <p class="hint-note muted">Backoffice does not fetch secrets — run the command in your terminal or open an external link.</p>
     </div>
   </td>
 </tr>

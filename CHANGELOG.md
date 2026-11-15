@@ -2,7 +2,12 @@
 
 ## Unreleased
 
+## 0.3.0 — 2026-11-15
+
 - Docs: full configuration guide in `docs/CONFIGURATION.md` (hub/env/team layout, version discovery, credentials, merge rules).
+- Optional `port_forward:` cheat-sheet on selected services (copy-paste `kubectl port-forward`; demo: Argo CD, Grafana, VictoriaMetrics, Jaeger, Kibana).
+- Curated `icon:` / `logo:` marks on services/products (catalog + id aliases; single calm tint); `GET /api/icons`.
+- Docker image target: `ghcr.io/liveelement/devops-backoffice:0.3.0`.
 
 ## 0.2.0 — 2026-11-15
 

@@ -15,7 +15,7 @@ spec:
       serviceAccountName: devops-backoffice
       containers:
         - name: backoffice
-          image: ghcr.io/liveelement/devops-backoffice:0.2.0
+          image: ghcr.io/liveelement/devops-backoffice:0.3.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -30,7 +30,7 @@ spec:
             - name: K8S_VERSION_DISCOVERY
               value: "true"
             - name: APP_VERSION
-              value: "0.2.0"
+              value: "0.3.0"
           volumeMounts:
             - name: links
               mountPath: /config
